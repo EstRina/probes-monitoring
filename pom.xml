@@ -81,5 +81,8 @@
 
 	<modules>
 		<module>analyzer</module>
+		<module>sensor-emails-provider</module>
+		<module>sensor-range-provider</module>
+		<module>admin-console</module>
 	</modules>
 </project>

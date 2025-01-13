@@ -10,35 +10,63 @@ import org.springframework.context.annotation.Bean;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import telran.probes.dto.DeviationData;
 import telran.probes.dto.ProbeData;
+import telran.probes.dto.Range;
 import telran.probes.service.RangeProviderClient;
 
 @SpringBootApplication
 @RequiredArgsConstructor
 @Slf4j
 public class AnalyzerAppl {
-	
+
 	@Value("${app.analyzer.producer.binding.name}")
 	String producerBindingName;
 
 	final RangeProviderClient service;
 	final StreamBridge bridge;
-	
+
 	public static void main(String[] args) {
-		
+
 		SpringApplication.run(AnalyzerAppl.class, args);
 
 	}
-	
+
 	@Bean
-	Consumer<ProbeData> analyzerConsumer(){
-		return probeData ->{
+	Consumer<ProbeData> analyzerConsumer() {
+		return probeData -> {
 			log.trace("recived probe^ {}", probeData);
-			//
-			log.debug("deviation: {}" );
-			//
-			log.debug("deviation data {} send to {}" );
+			try {
+				Range range = service.getRange(probeData.id());
+				log.debug("Fetched range for sensor {}: {}", probeData.id(), range);
+
+				double deviation = 0;
+				boolean isDeviation = false;
+				if (probeData.value() < range.min()) {
+					deviation = probeData.value() - range.min();
+					isDeviation = true;
+					log.debug("Value {} is less than the minimum {} for sensor {}", probeData.value(), range.min(),
+							probeData.id());
+				} 
+				if (probeData.value() > range.max()) {
+					deviation = probeData.value() - range.max();
+					isDeviation = true;
+					log.debug("Value {} is greater than the maximum {} for sensor {}", probeData.value(), range.max(),
+							probeData.id());
+				} 
+
+				if (isDeviation) {
+					DeviationData deviationData = new DeviationData(probeData.id(), deviation, probeData.value(),
+							probeData.timestamp());
+					log.debug("Created DeviationData: {}", deviationData);
+					 bridge.send(producerBindingName, deviationData);
+		                log.debug("Deviation data {} sent to {}", deviationData, producerBindingName);
+		            } else {
+		                log.debug("No deviation detected for probe: {}", probeData);
+		            }
+			} catch (Exception e) {
+				log.error("Error processing probe data: {}", probeData, e);
+			}
 		};
 	}
-
 }
