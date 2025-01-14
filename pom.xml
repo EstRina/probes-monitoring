@@ -85,5 +85,6 @@
 		<module>sensor-range-provider</module>
 		<module>admin-console</module>
 		<module>email-notifaer</module>
+		<module>avg-reducer</module>
 	</modules>
 </project>
