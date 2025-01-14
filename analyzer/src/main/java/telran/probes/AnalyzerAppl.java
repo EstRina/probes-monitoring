@@ -41,21 +41,18 @@ public class AnalyzerAppl {
 				log.debug("Fetched range for sensor {}: {}", probeData.id(), range);
 
 				double deviation = 0;
-				boolean isDeviation = false;
 				if (probeData.value() < range.min()) {
 					deviation = probeData.value() - range.min();
-					isDeviation = true;
 					log.debug("Value {} is less than the minimum {} for sensor {}", probeData.value(), range.min(),
 							probeData.id());
 				} 
 				if (probeData.value() > range.max()) {
 					deviation = probeData.value() - range.max();
-					isDeviation = true;
 					log.debug("Value {} is greater than the maximum {} for sensor {}", probeData.value(), range.max(),
 							probeData.id());
 				} 
 
-				if (isDeviation) {
+				if (deviation !=0) {
 					DeviationData deviationData = new DeviationData(probeData.id(), deviation, probeData.value(),
 							probeData.timestamp());
 					log.debug("Created DeviationData: {}", deviationData);

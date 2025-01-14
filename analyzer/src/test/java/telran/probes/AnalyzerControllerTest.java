@@ -3,6 +3,8 @@ package telran.probes;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+import java.util.function.Consumer;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import telran.probes.dto.DeviationData;
 import telran.probes.dto.ProbeData;
 import telran.probes.dto.Range;
+import telran.probes.dto.SensorUpdateData;
 import telran.probes.service.RangeProviderClient;
 
 @SpringBootTest
@@ -28,6 +31,9 @@ class AnalyzerControllerTest {
 
 	@MockBean
 	RangeProviderClient client;
+	
+	@MockBean
+	Consumer<SensorUpdateData> updateConsumer;
 	
 	@Autowired
 	InputDestination producer;
