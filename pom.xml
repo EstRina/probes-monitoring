@@ -84,5 +84,6 @@
 		<module>sensor-emails-provider</module>
 		<module>sensor-range-provider</module>
 		<module>admin-console</module>
+		<module>email-notifaer</module>
 	</modules>
 </project>
