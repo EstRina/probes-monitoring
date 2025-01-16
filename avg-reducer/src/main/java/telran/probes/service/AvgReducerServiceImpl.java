@@ -29,17 +29,12 @@ public class AvgReducerServiceImpl implements AvgReducerService{
 
 	        probesList.getValues().add(value);
 	        log.debug("Added value to ProbesList: sensorId={}, values={}", sensorId, probesList.getValues());
-
-	        if (probesList.getValues().size() > MAX_VALUES) {
-	            double removedValue = probesList.getValues().remove(0);
-	            log.debug("Removed oldest value from ProbesList: sensorId={}, removedValue={}", sensorId, removedValue);
-	        }
 	        
-//	        if (probesList.getValues().size() < MAX_VALUES) {
-//	            repo.save(probesList);
-//	            log.debug("ProbesList has less than MAX_VALUES, returning null.");
-//	            return (Double) null;
-//	        }
+	        if (probesList.getValues().size() < MAX_VALUES) {
+	            repo.save(probesList);
+	            log.debug("ProbesList has less than MAX_VALUES, returning null.");
+	            return (Double) null;
+	        }
 
 	        repo.save(probesList);
 	        log.debug("Updated ProbesList saved to repository: sensorId={}, values={}", sensorId, probesList.getValues());
