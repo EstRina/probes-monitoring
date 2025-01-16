@@ -1,7 +1,5 @@
 package telran.probes.service;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +15,10 @@ public class AvgReducerServiceImpl implements AvgReducerService{
 	@Autowired
 	ProbesListRepository repo;
 	
-	private static final int MAX_VALUES = 5;
+	private static final int MAX_VALUES = 2;
 	
 	@Override
-	public double getAvgValue(ProbeData data) {
+	public Double getAvgValue(ProbeData data) {
 			Long sensorId = data.id();
 	        Double value = data.value();
 	        log.debug("Received ProbeData: sensorId={}, value={}", sensorId, value);
@@ -33,7 +31,7 @@ public class AvgReducerServiceImpl implements AvgReducerService{
 	        if (probesList.getValues().size() < MAX_VALUES) {
 	            repo.save(probesList);
 	            log.debug("ProbesList has less than MAX_VALUES, returning null.");
-	            return (Double) null;
+	            return null;
 	        }
 
 	        repo.save(probesList);
