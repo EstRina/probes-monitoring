@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,7 @@ import telran.probes.service.EmailsProviderClient;
 @SpringBootTest
 @Import(TestChannelBinderConfiguration.class)
 @Slf4j
-class EmailsNotifaerControllerTest {
+class EmailsNotifierControllerTest {
 
 	private static final long SENSOR_ID = 123;
 	private static final double DEVIATION = -20;

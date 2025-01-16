@@ -7,12 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @SpringBootApplication
 @Slf4j
-public class EmailNotifaerAppl {
+public class EmailNotifierAppl {
 
 	public static void main(String[] args) {
 		
-		SpringApplication.run(EmailNotifaerAppl.class, args);
+		SpringApplication.run(EmailNotifierAppl.class, args);
 
 	}
 
+	
 }
