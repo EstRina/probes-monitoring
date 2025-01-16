@@ -7,12 +7,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.mockito.internal.matchers.Any;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -59,9 +57,8 @@ class AnalyzerServiceTest {
 	@Test
 	@Order(1)
 	void testNormalFlowNoCache() {
-		when(rest.exchange(URL+SENSOR_ID, HttpMethod.GET, null, Range.class)).
-		thenReturn(new ResponseEntity<Range>(RANGE, HttpStatus.OK));
-		
+		when(rest.exchange(URL+SENSOR_ID, HttpMethod.GET, null, Range.class))
+		.thenReturn(new ResponseEntity<Range>(RANGE, HttpStatus.OK));
 		assertEquals(RANGE, service.getRange(SENSOR_ID));
 	}
 	
@@ -69,34 +66,30 @@ class AnalyzerServiceTest {
 	@Order(2)
 	void testNormalFlowWithCache() {
 		verify(rest, never()).exchange(URL+SENSOR_ID, HttpMethod.GET, null, Range.class);
-		
-		assertEquals(RANGE, service.getRange(SENSOR_ID));		
+		assertEquals(RANGE, service.getRange(SENSOR_ID));	
 	}
 	
 	@Test
 	@Order(3)
 	void testSensorNotFound() {
-		when(rest.exchange(URL+SENSOR_ID_NOT_FOUND, HttpMethod.GET, null, String.class)).
-		thenReturn(new ResponseEntity<>(ErrorMessages.SENSOR_NOT_FOUND, HttpStatus.NOT_FOUND));
-		
+		when(rest.exchange(URL+SENSOR_ID_NOT_FOUND, HttpMethod.GET, null, String.class))
+		.thenReturn(new ResponseEntity<>(ErrorMessages.SENSOR_NOT_FOUND, HttpStatus.NOT_FOUND));
 		assertEquals(RANGE_DEFAULT, service.getRange(SENSOR_ID_NOT_FOUND));
 	}
 
 	@Test
 	@Order(4)
 	void testDefaultRangeNotInCache() {
-		when(rest.exchange(URL+SENSOR_ID_NOT_FOUND, HttpMethod.GET, null, Range.class)).
-		thenReturn(new ResponseEntity<Range>(RANGE, HttpStatus.OK));
-		
+		when(rest.exchange(URL+SENSOR_ID_NOT_FOUND, HttpMethod.GET, null, Range.class))
+		.thenReturn(new ResponseEntity<Range>(RANGE, HttpStatus.OK));
 		assertEquals(RANGE, service.getRange(SENSOR_ID_NOT_FOUND));
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	void testRemoteWebServerUnavailable() {
-		when(rest.exchange(anyString(), any(HttpMethod.class), any(), any(Class.class))).
-		thenThrow(new RuntimeException("Service is unavailable"));
-		
+		when(rest.exchange(anyString(), any(HttpMethod.class), any(), any(Class.class)))
+		.thenThrow(new RuntimeException("Service is ubavailable"));
 		assertEquals(RANGE_DEFAULT, service.getRange(SENSOR_ID_UNAVAILABLE));
 	}
 	

@@ -6,6 +6,9 @@ import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -32,8 +35,29 @@ public class RangeProviderClientImpl implements RangeProviderClient {
 	
 	@Override
 	public Range getRange(long sensorId) {
-		// TODO Auto-generated method stub
-		return null;
+		
+	    if (cache.containsKey(sensorId)) {
+	        log.debug("Range for sensor {} found in cache: {}", sensorId, cache.get(sensorId));
+	        return cache.get(sensorId);
+	    }
+
+	    String url = String.format("http://%s:%d%s/%d", host, port, path, sensorId);
+
+	    try {
+	        ResponseEntity<Range> response = rest.exchange(url, HttpMethod.GET, null, Range.class);
+
+	        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+	            Range range = response.getBody();
+	            cache.put(sensorId, range);
+	            log.debug("Range for sensor {} retrieved and cached: {}", sensorId, range);
+	            return range;
+	        }
+	    } catch (Exception e) {
+	        log.error("Failed to get range for sensor {}: {}", sensorId, e.getMessage());
+	    }
+
+	    log.warn("Returning default range for sensor {}: {}", sensorId, new Range(MIN_DEFAULT_VALUE, MAX_DEFAULT_VALUE));
+	    return new Range(MIN_DEFAULT_VALUE, MAX_DEFAULT_VALUE);
 	}
 	
 	@Bean
