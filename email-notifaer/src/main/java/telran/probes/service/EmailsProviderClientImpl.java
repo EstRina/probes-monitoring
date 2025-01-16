@@ -104,17 +104,6 @@ public class EmailsProviderClientImpl implements EmailsProviderClient{
         };
     }
 
-//    private void sendEmail(String email, DeviationData data) throws MessagingException {
-//        MimeMessage message = mailSender.createMimeMessage();
-//        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-//        helper.setFrom(sender);
-//        helper.setTo(email);
-//        helper.setSubject("Deviation Alert: Sensor " + data.id());
-//        helper.setText(String.format("Sensor %d reported a deviation of %.2f with value %.2f.",
-//                data.id(), data.deviation(), data.value()), true);
-//        mailSender.send(message);
-//    }
-
     
 
 }
