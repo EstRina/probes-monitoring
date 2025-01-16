@@ -24,13 +24,13 @@ public class RangeProviderClientImpl implements RangeProviderClient {
 	RestTemplate rest = new RestTemplate();
 	HashMap<Long, Range> cache = new HashMap<Long, Range>();
 	
-	@Value("app.range.provider.host:localhost")
+	@Value("${app.range.provider.host:localhost}")
 	String host;
 	
-	@Value("app.range.provider.port:8080")
+	@Value("${app.range.provider.port:8080}")
 	int port;
 	
-	@Value("app.range.provider.path:/sensor/range")
+	@Value("${app.range.provider.path:/sensor/range}")
 	String path;
 	
 	@Override
