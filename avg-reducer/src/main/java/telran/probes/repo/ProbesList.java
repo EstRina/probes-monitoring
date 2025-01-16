@@ -18,5 +18,13 @@ public class ProbesList {
 	@Id
 	@NotNull
 	Long sensorId;
+	
 	List<Double> values = new ArrayList<>();
+
+	public ProbesList(Long sensorId) {
+		super();
+		this.sensorId = sensorId;
+	}
+	
+	
 }
