@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -23,81 +22,77 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.web.client.RestTemplate;
 
-import telran.probes.dto.Range;
 import telran.probes.dto.SensorUpdateData;
-import telran.probes.messages.ErrorMessages;
 import telran.probes.service.EmailsProviderClient;
-import telran.probes.service.EmailsProviderClientImpl;
-
+import static telran.probes.messages.ErrorMessages.*;
 
 @SpringBootTest
 @Import(TestChannelBinderConfiguration.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class EmailNotifierServiceTest {
-
 	private static final long SENSOR_ID = 123;
-	private static final String[] EMAILS = {"test@gmail.com", "test@co.il"};
+	private static final String[] EMAILS = { "mail1@gmail.com", "mail2@gmail.com" };
+	private static final String URL = "http://localhost:8080/sensor/emails/";
 	private static final long SENSOR_ID_NOT_FOUND = 124;
-	private static final String[] EMPTY_EMAILS = new String[0];
-	private static final String[] UPDATE_EMAILS = {"update1@co.il", "update2@co.il"};
+	private static final String[] EMAILS_DEFAULT = { "service-sensors@gmail.com" };
 	private static final long SENSOR_ID_UNAVAILABLE = 125;
-	private static final String URL = "http://localhost:8080/sensor/range/";
-	private String updateBindingName = "updateEmailsConsumer-in-0";
-	
+	private static final String[] EMAILS_UPDATED = { "mail3@gmail.com" };
 	@Autowired
 	InputDestination producer;
-	
 	@Autowired
 	EmailsProviderClient service;
-	
 	@MockBean
-	RestTemplate rest;
+	RestTemplate restTemplate;
+	private String updateBindingName = "updateEmailsConsumer-in-0";
 
 	@Test
 	@Order(1)
-	void testNormalFlowNoCache() {
-		when(rest.exchange(URL+SENSOR_ID, HttpMethod.GET, null, String[].class))
-		.thenReturn(new ResponseEntity<>(EMAILS, HttpStatus.OK));
+	void normalFlowNoCache() {
+		when(restTemplate.exchange(getUrl(SENSOR_ID), HttpMethod.GET, null, String[].class))
+				.thenReturn(new ResponseEntity<>(EMAILS, HttpStatus.OK));
 		assertArrayEquals(EMAILS, service.getEmails(SENSOR_ID));
 	}
-	
-	@Test
+
 	@Order(2)
-	void testNormalFlowWithCache() {
-		verify(rest, never()).exchange(URL+SENSOR_ID, HttpMethod.GET, null, String[].class);
-		assertArrayEquals(EMAILS, service.getEmails(SENSOR_ID));	
+	@Test
+	void normalFlowWithCache() {
+		verify(restTemplate, never()).exchange(getUrl(SENSOR_ID), HttpMethod.GET, null, String[].class);
+		assertEquals(EMAILS, service.getEmails(SENSOR_ID));
 	}
-	
+
 	@Test
 	@Order(3)
-	void testSensorNotFound() {
-		when(rest.exchange(URL+SENSOR_ID_NOT_FOUND, HttpMethod.GET, null, String[].class))
-		.thenReturn(new ResponseEntity<>(EMPTY_EMAILS, HttpStatus.OK));
-		assertArrayEquals(EMPTY_EMAILS, service.getEmails(SENSOR_ID_NOT_FOUND));
+	void sensorNotFoundTest() {
+		when(restTemplate.exchange(getUrl(SENSOR_ID_NOT_FOUND), HttpMethod.GET, null, String.class))
+				.thenReturn(new ResponseEntity<>(SENSOR_NOT_FOUND, HttpStatus.NOT_FOUND));
+		assertArrayEquals(EMAILS_DEFAULT, service.getEmails(SENSOR_ID_NOT_FOUND));
 	}
 
 	@Test
 	@Order(4)
-	void testDefaultEmailNotInCache() {
-		when(rest.exchange(URL+SENSOR_ID_NOT_FOUND, HttpMethod.GET, null, String[].class))
-		.thenReturn(new ResponseEntity<>(EMAILS, HttpStatus.OK));
-		assertArrayEquals(EMAILS, service.getEmails(SENSOR_ID_NOT_FOUND));
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test
-	void testRemoteWebServerUnavailable() {
-		when(rest.exchange(anyString(), any(HttpMethod.class), any(), any(Class.class)))
-		.thenThrow(new RuntimeException("Service is ubavailable"));
-		assertArrayEquals(EMPTY_EMAILS, service.getEmails(SENSOR_ID_UNAVAILABLE));
-	}
-	
-	@Test
-	void testUpdateEmailInMap() throws InterruptedException {
-		producer.send(new GenericMessage<SensorUpdateData>(new SensorUpdateData(SENSOR_ID, null, UPDATE_EMAILS)),
-				updateBindingName);
-		Thread.sleep(1000);
-		assertArrayEquals(UPDATE_EMAILS, service.getEmails(SENSOR_ID));
+	void defaultNotInCache() {
+		when(restTemplate.exchange(getUrl(SENSOR_ID_NOT_FOUND), HttpMethod.GET, null, String[].class))
+				.thenReturn(new ResponseEntity<>(EMAILS_DEFAULT, HttpStatus.OK));
+		assertArrayEquals(EMAILS_DEFAULT, service.getEmails(SENSOR_ID_NOT_FOUND));
 	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	void remoteWebServiceUnavailable() {
+		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(), any(Class.class)))
+				.thenThrow(new RuntimeException("Service is unavailable"));
+		assertArrayEquals(EMAILS_DEFAULT, service.getEmails(SENSOR_ID_UNAVAILABLE));
+	}
+
+	@Test
+	void updateRangeSensorInMap() throws InterruptedException {
+		producer.send(new GenericMessage<SensorUpdateData>(new SensorUpdateData(SENSOR_ID, null, EMAILS_UPDATED)),
+				updateBindingName);
+		Thread.sleep(100);
+		assertArrayEquals(EMAILS_UPDATED, service.getEmails(SENSOR_ID));
+	}
+
+	private String getUrl(long sensorId) {
+		return URL + sensorId;
+	}
 }
