@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,5 +66,10 @@ public class AnalyzerAppl {
 				log.error("Error processing probe data: {}", probeData, e);
 			}
 		};
+	}
+	
+	@Bean
+	RestTemplate getRestTemplate() {
+		return new RestTemplate();
 	}
 }
