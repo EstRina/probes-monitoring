@@ -63,6 +63,10 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-stream-binder-kafka</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-stream-test-binder</artifactId>
 			<scope>test</scope>
 		</dependency>
@@ -87,5 +91,8 @@
 		<module>email-notifaer</module>
 		<module>avg-reducer</module>
 		<module>avg-populator</module>
+		<module>config-server</module>
+
+		<module>probes</module>
 	</modules>
 </project>
