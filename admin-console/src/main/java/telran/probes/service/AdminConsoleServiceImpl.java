@@ -1,5 +1,6 @@
 package telran.probes.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -21,10 +22,12 @@ import telran.probes.model.SensorRangeDoc;
 @Slf4j
 @RequiredArgsConstructor
 public class AdminConsoleServiceImpl implements AdminConsoleService {
+	
 	final MongoTemplate mongoTemplate;
 	final StreamBridge streamBridge;
 	String collectionNameRanges = "sensor_ranges";
 	String collectionNameMails = "sensor_emails";
+	@Value("${app.update.data.binding.name}")
 	String bindingName;
 	FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true).upsert(false);
 

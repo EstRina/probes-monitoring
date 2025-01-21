@@ -13,6 +13,7 @@ import telran.probes.service.AdminConsoleService;
 @RequiredArgsConstructor
 @Slf4j
 public class AdminConsoleController {
+	
 	final AdminConsoleService adminConsoleService;
 	
 	@Value("${app.admin.console.emails.path}")
